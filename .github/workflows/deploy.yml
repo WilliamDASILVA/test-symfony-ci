@@ -10,55 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
       - name: Check Out Repo
         uses: actions/checkout@v2
-      
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-          
-      - name: Build and push php image
-        id: docker_build_php
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./docker/php/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/symfony-ci-php:latest
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build_php.outputs.digest }}
-        
-      - name: SCP Command to Transfer Files
-        uses: appleboy/scp-action@v0.1.1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          port: ${{ secrets.PORT }}
-          password: ${{ secrets.PASSWORD }}
-          source: "."
-          target: "/home/ci/app"
-        
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@master
         env:
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+          DB_USER: "yo"
         with:
-          envs: DB_DATABASE,DB_USER,DB_PASSWORD,DB_ROOT_PASSWORD
+          envs: DB_USER
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
+          debug: true
           script: |
-            cd /home/ci/app
-            echo $DB_DATABASE
-            export MYSQL_DATABASE=$DB_DATABASE
-            composer install
-            docker-compose up -d --build --force-recreate
-            docker exec -d ci-php bin/console d:m:m
+            echo "test"
+            echo $DB_USER
+
+          # export MYSQL_DATABASE=$DB_DATABASE
+          # composer install
+          # docker-compose config
+          # docker-compose up -d --build --force-recreate
+          # docker exec -d ci-php bin/console d:m:m

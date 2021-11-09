@@ -40,7 +40,7 @@ jobs:
             echo $DB_USER
             export HELLO=$DB_USER
             echo $HELLO
-            docker-compose config
+            DB_USER=$DB_USER docker-compose config
 
           # export MYSQL_DATABASE=$DB_DATABA
           # composer install

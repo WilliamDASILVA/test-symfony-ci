@@ -35,6 +35,7 @@ jobs:
           port: ${{ secrets.PORT }}
           debug: true
           script: |
+            cd /home/ci/app
             echo "test"
             echo $DB_USER
             export HELLO=$DB_USER

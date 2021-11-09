@@ -27,21 +27,21 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           DB_USER: "MY-DB-USER"
-          TEST: ${{ secrets.PASSWORD }}
         with:
           envs: DB_USER
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.PASSWORDSE }}
           port: ${{ secrets.PORT }}
           debug: true
           script: |
             echo "test"
             echo $DB_USER
-            echo $TEST
+            export HELLO=$DB_USER
+            echo $HELLO
             docker-compose config
 
-          # export MYSQL_DATABASE=$DB_DATABASE
+          # export MYSQL_DATABASE=$DB_DATABA
           # composer install
           # docker-compose config
           # docker-compose up -d --build --force-recreate

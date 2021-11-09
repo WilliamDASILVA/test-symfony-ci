@@ -1,0 +1,60 @@
+version: "3.9"
+
+networks:
+  ci:
+
+volumes:
+  ci-data:
+
+services:
+  http:
+    image: httpd:2.4
+    container_name: ci-http
+    networks:
+      - ci
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker/http/http.conf:/usr/local/apache2/conf/httpd.conf:ro
+      - ./docker/http/vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf:ro
+      - ./public:/usr/local/apache2/htdocs/public:rw
+
+  php:
+    depends_on:
+      - db
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      context: .
+    container_name: ci-php
+    networks:
+      - ci
+    ports:
+      - 9000:9000
+    volumes:
+      - ./:/usr/local/apache2/htdocs:rw
+    tmpfs:
+      - /usr/local/apache2/htdocs/var:mode=700,uid=33,gid=33
+
+  db:
+    image: mariadb
+    container_name: ci-db
+    networks:
+      - ci
+    ports:
+      - 3306:3306
+    volumes:
+      - ci-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+
+  mail:
+    image: maildev/maildev
+    container_name: ci-mail
+    networks:
+      - ci
+    ports:
+      - 8090:80
+    command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS

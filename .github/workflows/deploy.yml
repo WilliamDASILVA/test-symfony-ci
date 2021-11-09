@@ -26,7 +26,8 @@ jobs:
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@master
         env:
-          DB_USER: "yo"
+          DB_USER: "MY-DB-USER"
+          TEST: ${{ secrets.PASSWORD }}
         with:
           envs: DB_USER
           host: ${{ secrets.HOST }}
@@ -37,6 +38,8 @@ jobs:
           script: |
             echo "test"
             echo $DB_USER
+            echo $TEST
+            docker-compose config
 
           # export MYSQL_DATABASE=$DB_DATABASE
           # composer install
